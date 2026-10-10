@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator Akuntansi Dasar</title>
+<meta name="description" content="Catat transaksi, jurnal debit kredit muncul otomatis. Lengkap dengan buku besar dan neraca saldo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F6F4;--card:#fff;--ink:#14262E;--mute:#5B6E69;--rule:#C9D6D0;--acc:#0E6B5A;--accfg:#fff;--err:#B3261E}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101A1D;--card:#17252A;--ink:#E4EEEA;--mute:#92A6A0;--rule:#2C4048;--acc:#4CC2A8;--accfg:#06201A;--err:#FF8A80}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:780px;margin:0 auto;padding:28px 16px 56px}
+h1{font-size:clamp(28px,6vw,40px);line-height:1.08;margin:0 0 8px;font-weight:800;letter-spacing:-.02em}
+h2{font-size:18px;margin:0 0 4px}
+h3{font-size:16px;margin:0 0 6px}
+h3 small{font-weight:400;color:var(--mute);font-size:13px}
+.sub{margin:0 0 20px;color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:18px;margin-bottom:16px}
+.steps{margin:0 0 18px;padding-left:20px;color:var(--mute);font-size:15px}
+label{display:block;font-weight:700;font-size:15px;margin:16px 0 6px}
+label:first-child{margin-top:0}
+select,input{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:10px 12px}
+input.amt{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+details{margin-top:14px;font-size:15px}
+summary{cursor:pointer;color:var(--mute)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two label{margin-top:10px}
+.pv{margin-top:16px;border-top:1px dashed var(--rule);padding-top:12px;min-height:90px}
+.hint{color:var(--mute);font-size:14px;margin:0}
+.pv table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.pv td{padding:3px 0}
+.n{text-align:right}
+.in{padding-left:24px}
+.why{margin:8px 0 0;padding:0;list-style:none;color:var(--mute);font-size:13px}
+#err{color:var(--err);font-size:14px;min-height:20px;margin:8px 0 0}
+.btn{width:100%;font:inherit;font-weight:700;background:var(--acc);color:var(--accfg);border:0;border-radius:8px;padding:12px;cursor:pointer}
+.btn:hover{filter:brightness(1.07)}
+.ghost{font:inherit;font-size:14px;background:transparent;color:var(--mute);border:1px solid var(--rule);border-radius:6px;padding:6px 10px;cursor:pointer}
+.ghost:hover{color:var(--ink);border-color:var(--ink)}
+.ghost.danger:hover{color:var(--err);border-color:var(--err)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:16px;background:var(--card)}
+.tabs button{font:inherit;font-weight:500;padding:11px 6px;border:0;background:transparent;color:var(--mute);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--acc);color:var(--accfg);font-weight:700}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.bar div{display:flex;gap:8px}
+.tw{overflow-x:auto}
+table.j{width:100%;border-collapse:collapse;min-width:480px;font-variant-numeric:tabular-nums}
+.j th{font-size:13px;font-weight:700;color:var(--mute);text-align:left;padding:8px 6px;border-bottom:2px solid var(--ink)}
+.j th.n{text-align:right}
+.j td{padding:4px 6px;vertical-align:top}
+.j tr.e td{padding-top:12px}
+.j tr.last td{padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.j .dt{white-space:nowrap;color:var(--mute);font-size:14px;width:96px}
+.j .ds{padding-left:40px;font-style:italic;color:var(--mute);font-size:14px}
+.j .x{font:inherit;font-size:13px;color:var(--mute);background:none;border:0;cursor:pointer;text-decoration:underline}
+.j .x:hover{color:var(--err)}
+.j tr.tot td{font-weight:800;border-top:1px solid var(--ink);border-bottom:3px double var(--ink);padding:8px 6px}
+.j td.st{font-size:14px;font-weight:700;padding-top:10px}
+.ok{color:var(--acc)}.bad{color:var(--err)}
+.empty{color:var(--mute);text-align:center;padding:24px 6px!important}
+.empty button{margin-top:10px}
+.acc{margin-bottom:20px}
+.note{font-size:13px;color:var(--mute);margin:6px 0 0}
+[hidden]{display:none!important}
+@media print{.noprint{display:none!important}body{background:#fff;color:#000}.card{border:0;padding:0}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Kalkulator Akuntansi Dasar</h1>
+  <p class="sub noprint">Catat transaksi, jurnal debit dan kredit muncul otomatis.</p>
+
+  <section class="card noprint" aria-label="Catat transaksi">
+    <ol class="steps"><li>Pilih jenis transaksi</li><li>Isi nominal</li><li>Cek jurnalnya, lalu klik Catat</li></ol>
+    <label for="tpl">1. Jenis transaksi</label>
+    <select id="tpl"></select>
+    <div id="custom" class="two" hidden>
+      <div><label for="cd">Akun debit</label><select id="cd"></select></div>
+      <div><label for="ck">Akun kredit</label><select id="ck"></select></div>
+    </div>
+    <label for="amt">2. Nominal (Rp)</label>
+    <input class="amt" id="amt" inputmode="numeric" autocomplete="off" placeholder="0">
+    <details>
+      <summary>Tanggal dan keterangan (opsional)</summary>
+      <div class="two">
+        <div><label for="dt">Tanggal</label><input type="date" id="dt"></div>
+        <div><label for="ds">Keterangan</label><input id="ds" maxlength="80" placeholder="Contoh: Bayar sewa Oktober"></div>
+      </div>
+    </details>
+    <div class="pv" id="pv" aria-live="polite"></div>
+    <p id="err" role="alert"></p>
+    <button class="btn" id="add" type="button">3. Catat ke jurnal</button>
+  </section>
+
+  <div class="tabs noprint" role="tablist" aria-label="Laporan">
+    <button role="tab" id="t-jurnal" aria-selected="true" data-tab="jurnal">Jurnal</button>
+    <button role="tab" id="t-buku" aria-selected="false" data-tab="buku">Buku Besar</button>
+    <button role="tab" id="t-ns" aria-selected="false" data-tab="ns">Neraca Saldo</button>
+  </div>
+
+  <section class="card" id="p-jurnal" role="tabpanel" aria-labelledby="t-jurnal">
+    <div class="bar"><h2>Jurnal umum</h2><div class="noprint"><button class="ghost" data-print type="button">Cetak</button><button class="ghost danger" id="clear" type="button">Hapus semua</button></div></div>
+    <div class="tw"><table class="j">
+      <thead><tr><th>Tanggal</th><th>Akun dan keterangan</th><th class="n">Debit</th><th class="n">Kredit</th><th class="noprint"></th></tr></thead>
+      <tbody id="body"></tbody><tfoot id="foot"></tfoot>
+    </table></div>
+  </section>
+
+  <section class="card" id="p-buku" role="tabpanel" aria-labelledby="t-buku" hidden>
+    <div class="bar"><h2>Buku besar</h2><div class="noprint"><button class="ghost" data-print type="button">Cetak</button></div></div>
+    <p class="note" style="margin-bottom:14px">Setiap akun punya catatannya sendiri, diambil otomatis dari jurnal.</p>
+    <div id="buku"></div>
+  </section>
+
+  <section class="card" id="p-ns" role="tabpanel" aria-labelledby="t-ns" hidden>
+    <div class="bar"><h2>Neraca saldo</h2><div class="noprint"><button class="ghost" data-print type="button">Cetak</button></div></div>
+    <div class="tw"><table class="j">
+      <thead><tr><th>Akun</th><th class="n">Debit</th><th class="n">Kredit</th></tr></thead>
+      <tbody id="nsb"></tbody><tfoot id="nsf"></tfoot>
+    </table></div>
+  </section>
+
+  <p class="note noprint">Metode persediaan: periodik. Data tersimpan di browser ini saja.</p>
+</main>
+<script>
+// [nama, golongan, saldo normal]
+const A={
+kas:['Kas','Aset','D'],piutang:['Piutang Usaha','Aset','D'],perlengkapan:['Perlengkapan','Aset','D'],
+peralatan:['Peralatan','Aset','D'],sewadm:['Sewa Dibayar Dimuka','Aset','D'],
+utang:['Utang Usaha','Utang','K'],utangbank:['Utang Bank','Utang','K'],pdd:['Pendapatan Diterima Dimuka','Utang','K'],
+modal:['Modal Pemilik','Modal','K'],prive:['Prive','Modal','D'],
+pjasa:['Pendapatan Jasa','Pendapatan','K'],penjualan:['Penjualan','Pendapatan','K'],returjual:['Retur Penjualan','Kontra Pendapatan','D'],
+pembelian:['Pembelian','Harga Pokok','D'],returbeli:['Retur Pembelian','Kontra Harga Pokok','K'],angkutbeli:['Beban Angkut Pembelian','Harga Pokok','D'],
+angkutjual:['Beban Angkut Penjualan','Beban','D'],gaji:['Beban Gaji','Beban','D'],sewa:['Beban Sewa','Beban','D'],listrik:['Beban Listrik, Air, dan Telepon','Beban','D']
+};
+const G={u:'Transaksi umum',j:'Usaha jasa',d:'Usaha dagang'};
+// [id, label, grup, akun debit, akun kredit]
+const T=[
+['setor','Pemilik menyetor modal tunai','u','kas','modal'],
+['prive','Pemilik mengambil kas untuk pribadi (prive)','u','prive','kas'],
+['pinjam','Terima pinjaman dari bank','u','kas','utangbank'],
+['perlt','Beli perlengkapan tunai','u','perlengkapan','kas'],
+['perlk','Beli perlengkapan secara kredit','u','perlengkapan','utang'],
+['alt','Beli peralatan tunai','u','peralatan','kas'],
+['alk','Beli peralatan secara kredit','u','peralatan','utang'],
+['sewadm','Bayar sewa untuk beberapa periode ke depan','u','sewadm','kas'],
+['sewa','Bayar beban sewa','u','sewa','kas'],
+['gaji','Bayar beban gaji','u','gaji','kas'],
+['listrik','Bayar listrik, air, dan telepon','u','listrik','kas'],
+['bayarutang','Bayar utang usaha','u','utang','kas'],
+['terimapiutang','Terima pelunasan piutang','u','kas','piutang'],
+['jasat','Terima pendapatan jasa tunai','j','kas','pjasa'],
+['jasak','Jasa sudah diberikan, belum dibayar (piutang)','j','piutang','pjasa'],
+['uangmuka','Terima uang muka dari pelanggan','j','kas','pdd'],
+['belit','Beli barang dagang tunai','d','pembelian','kas'],
+['belik','Beli barang dagang secara kredit','d','pembelian','utang'],
+['angkutbeli','Bayar ongkos angkut pembelian','d','angkutbeli','kas'],
+['returbeli','Retur pembelian (kurangi utang)','d','utang','returbeli'],
+['juals','Jual barang dagang tunai','d','kas','penjualan'],
+['jualk','Jual barang dagang secara kredit','d','piutang','penjualan'],
+['angkutjual','Bayar ongkos angkut penjualan','d','angkutjual','kas'],
+['returjual','Retur penjualan (kurangi piutang)','d','returjual','piutang']
+];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>n.toLocaleString('id-ID');
+const sal=n=>n<0?'('+fmt(-n)+')':fmt(n);
+const fd=s=>new Date(s+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+let S={entries:[]};
+try{const r=localStorage.getItem('akuntansi-v2');if(r){const p=JSON.parse(r);if(p&&Array.isArray(p.entries))S=p}}catch(e){}
+const save=()=>{try{localStorage.setItem('akuntansi-v2',JSON.stringify(S))}catch(e){}};
+const nm=k=>esc(A[k][0]);
+
+function init(){
+  let h='';
+  ['u','j','d'].forEach(g=>{h+=`<optgroup label="${G[g]}">`+T.filter(t=>t[2]===g).map(t=>`<option value="${t[0]}">${esc(t[1])}</option>`).join('')+'</optgroup>'});
+  $('tpl').innerHTML=h+'<option value="custom">Transaksi lain (pilih akun sendiri)</option>';
+  const o=Object.keys(A).map(k=>`<option value="${k}">${nm(k)}</option>`).join('');
+  $('cd').innerHTML=o;$('ck').innerHTML=o;$('cd').value='kas';$('ck').value='modal';
+  $('dt').value=today();
+}
+function pair(){
+  if($('tpl').value==='custom')return{d:$('cd').value,k:$('ck').value,label:'Transaksi lain'};
+  const t=T.find(x=>x[0]===$('tpl').value);return{d:t[3],k:t[4],label:t[1]};
+}
+const amount=()=>parseInt($('amt').value.replace(/\D/g,''),10)||0;
+const why=(k,s)=>`${A[k][0]} (${A[k][1]}) ${A[k][2]===s?'bertambah':'berkurang'}, jadi dicatat di ${s==='D'?'Debit':'Kredit'}.`;
+
+function preview(){
+  $('custom').hidden=$('tpl').value!=='custom';
+  const p=pair(),a=amount();
+  if(p.d===p.k){$('pv').innerHTML='<p class="hint">Akun debit dan kredit tidak boleh sama.</p>';return}
+  if(!a){$('pv').innerHTML='<p class="hint">Isi nominal, jurnalnya akan muncul di sini.</p>';return}
+  $('pv').innerHTML=`<table><tr><td>${nm(p.d)}</td><td class="n">${fmt(a)}</td><td class="n"></td></tr>
+  <tr><td class="in">${nm(p.k)}</td><td class="n"></td><td class="n">${fmt(a)}</td></tr></table>
+  <ul class="why"><li>${esc(why(p.d,'D'))}</li><li>${esc(why(p.k,'K'))}</li></ul>`;
+}
+function jurnal(){
+  let D=0,K=0,h='';
+  S.entries.forEach(e=>{
+    const dl=e.lines[0],kl=e.lines[1];D+=dl.a;K+=kl.a;
+    h+=`<tr class="e"><td class="dt">${fd(e.date)}</td><td>${nm(dl.k)}</td><td class="n">${fmt(dl.a)}</td><td></td><td class="noprint"><button class="x" type="button" data-id="${e.id}" aria-label="Hapus transaksi ini">Hapus</button></td></tr>
+    <tr><td></td><td class="in">${nm(kl.k)}</td><td></td><td class="n">${fmt(kl.a)}</td><td class="noprint"></td></tr>
+    <tr class="last"><td></td><td class="ds">(${esc(e.desc||e.label)})</td><td></td><td></td><td class="noprint"></td></tr>`;
+  });
+  $('body').innerHTML=h||'<tr><td colspan="5" class="empty">Belum ada transaksi.<br>Isi formulir di atas, atau lihat dulu contohnya.<br><button class="ghost" id="demo" type="button">Muat contoh transaksi</button></td></tr>';
+  $('foot').innerHTML=S.entries.length?`<tr class="tot"><td colspan="2">Jumlah</td><td class="n">${fmt(D)}</td><td class="n">${fmt(K)}</td><td class="noprint"></td></tr>
+  <tr><td colspan="5" class="st ${D===K?'ok':'bad'}">${D===K?'Seimbang: total debit sama dengan total kredit':'Tidak seimbang, selisih '+fmt(Math.abs(D-K))}</td></tr>`:'';
+}
+function buku(){
+  const m={};
+  S.entries.forEach(e=>e.lines.forEach(l=>{(m[l.k]=m[l.k]||[]).push({date:e.date,desc:e.desc||e.label,s:l.s,a:l.a})}));
+  const keys=Object.keys(A).filter(k=>m[k]);
+  $('buku').innerHTML=keys.length?keys.map(k=>{
+    let bal=0;
+    const rows=m[k].map(r=>{bal+=(r.s===A[k][2]?1:-1)*r.a;
+      return `<tr><td class="dt">${fd(r.date)}</td><td>${esc(r.desc)}</td><td class="n">${r.s==='D'?fmt(r.a):''}</td><td class="n">${r.s==='K'?fmt(r.a):''}</td><td class="n">${sal(bal)}</td></tr>`}).join('');
+    return `<div class="acc"><h3>${nm(k)} <small>${A[k][1]}, saldo normal di ${A[k][2]==='D'?'Debit':'Kredit'}</small></h3><div class="tw"><table class="j"><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="n">Debit</th><th class="n">Kredit</th><th class="n">Saldo</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }).join(''):'<p class="hint">Belum ada data. Catat transaksi dulu di tab Jurnal.</p>';
+}
+function ns(){
+  const net={};
+  S.entries.forEach(e=>e.lines.forEach(l=>{net[l.k]=(net[l.k]||0)+(l.s==='D'?l.a:-l.a)}));
+  let D=0,K=0,h='';
+  Object.keys(A).filter(k=>k in net).forEach(k=>{
+    const v=net[k],d=v>0?v:0,c=v<0?-v:0;D+=d;K+=c;
+    h+=`<tr><td>${nm(k)}</td><td class="n">${d?fmt(d):''}</td><td class="n">${c?fmt(c):''}</td></tr>`;
+  });
+  $('nsb').innerHTML=h||'<tr><td colspan="3" class="empty">Belum ada data. Catat transaksi dulu di tab Jurnal.</td></tr>';
+  $('nsf').innerHTML=h?`<tr class="tot"><td>Jumlah</td><td class="n">${fmt(D)}</td><td class="n">${fmt(K)}</td></tr>
+  <tr><td colspan="3" class="st ${D===K?'ok':'bad'}">${D===K?'Seimbang: total debit sama dengan total kredit':'Tidak seimbang, selisih '+fmt(Math.abs(D-K))}</td></tr>`:'';
+}
+const renderAll=()=>{jurnal();buku();ns()};
+const add=(date,desc,label,d,k,a)=>S.entries.push({id:Date.now()+'-'+Math.random().toString(36).slice(2,7),date,desc,label,lines:[{k:d,s:'D',a},{k:k,s:'K',a}]});
+const sortE=()=>S.entries.sort((x,y)=>x.date<y.date?-1:x.date>y.date?1:0);
+
+$('tpl').onchange=$('cd').onchange=$('ck').onchange=()=>{$('err').textContent='';preview()};
+$('amt').oninput=()=>{const n=amount();$('amt').value=n?fmt(n):'';$('err').textContent='';preview()};
+$('add').onclick=()=>{
+  const p=pair(),a=amount();
+  if(p.d===p.k){$('err').textContent='Akun debit dan kredit tidak boleh sama.';return}
+  if(!a){$('err').textContent='Isi nominal lebih dari 0.';$('amt').focus();return}
+  add($('dt').value||today(),$('ds').value.trim(),p.label,p.d,p.k,a);
+  sortE();save();renderAll();
+  $('amt').value='';$('ds').value='';$('err').textContent='';preview();$('amt').focus();
+};
+$('body').onclick=e=>{
+  if(e.target.id==='demo'){
+    const y=new Date().getFullYear(),m=String(new Date().getMonth()+1).padStart(2,'0'),d=n=>`${y}-${m}-0${n}`;
+    add(d(1),'Modal awal usaha','','kas','modal',10000000);
+    add(d(2),'Beli meja dan kursi','','peralatan','kas',3000000);
+    add(d(4),'Jasa desain untuk klien','','kas','pjasa',5000000);
+    add(d(6),'Sewa ruko bulan ini','','sewa','kas',1000000);
+    add(d(8),'Jasa belum dibayar klien','','piutang','pjasa',2500000);
+    save();renderAll();return;
+  }
+  const id=e.target.dataset&&e.target.dataset.id;if(!id)return;
+  S.entries=S.entries.filter(x=>x.id!==id);save();renderAll();
+};
+let armed=false,tm;
+$('clear').onclick=()=>{
+  if(!S.entries.length)return;
+  if(!armed){armed=true;$('clear').textContent='Yakin hapus semua?';tm=setTimeout(()=>{armed=false;$('clear').textContent='Hapus semua'},3000);return}
+  clearTimeout(tm);armed=false;$('clear').textContent='Hapus semua';S.entries=[];save();renderAll();
+};
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-tab]').forEach(x=>{const on=x===b;x.setAttribute('aria-selected',on);$('p-'+x.dataset.tab).hidden=!on});
+});
+document.querySelectorAll('[data-print]').forEach(b=>b.onclick=()=>window.print());
+init();preview();renderAll();
+</script>
+</body>
+</html>
