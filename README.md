@@ -1,35 +1,28 @@
 # Kalkulator Akuntansi Dasar
 
-Website sederhana untuk belajar pencatatan akuntansi. Pilih jenis transaksi, isi nominal, lalu jurnal debit dan kredit muncul otomatis.
+Website untuk belajar dan mencatat akuntansi. Pilih jenis transaksi, isi nominal, lalu jurnal debit dan kredit muncul otomatis beserta alasannya.
 
 ## Fitur
 
-- Jurnal umum otomatis (24 template transaksi usaha jasa dan dagang, plus opsi pilih akun sendiri)
-- Penjelasan kenapa sebuah akun masuk debit atau kredit
-- Buku besar per akun dengan saldo berjalan
-- Neraca saldo dengan pengecekan seimbang
-- Cetak ke PDF lewat tombol Cetak
-- Data tersimpan di browser (localStorage), tanpa server dan tanpa biaya
+- **Pengaturan usaha** saat pertama dibuka: jenis usaha (jasa atau dagang), bentuk usaha (perorangan atau PT), metode persediaan (periodik atau perpetual)
+- Template transaksi menyesuaikan pengaturan, termasuk jurnal dengan banyak baris (misalnya penjualan perpetual dengan HPP)
+- **Daftar akun** bisa diubah namanya dan ditambah akun baru
+- Jurnal umum, jurnal penyesuaian, buku besar, neraca saldo (sebelum dan sesudah penyesuaian)
+- Laporan keuangan otomatis: laba rugi, perubahan modal (perorangan) atau perubahan ekuitas (PT), neraca
+- Cetak ke PDF, bisa dipasang sebagai aplikasi (PWA), data tersimpan di browser
 
-Metode persediaan yang dipakai: **periodik** (akun Pembelian dan Penjualan).
+## File
 
-## Cara pakai di komputer
+`index.html`, `manifest.json`, `sw.js`, `icon-192.png`, `icon-512.png`
 
-Buka file `index.html` dengan browser (klik dua kali). Tidak perlu install apa pun.
+## Upload ke GitHub dan Vercel
 
-## Cara upload ke GitHub dan jadikan website
+1. Upload semua file di atas ke satu repository GitHub (root).
+2. Di vercel.com, Import repository tersebut, Framework Preset: Other, lalu Deploy.
+3. Setiap perubahan yang di-commit ke GitHub otomatis diperbarui di Vercel.
 
-1. Buat akun di github.com, lalu klik **New repository**. Beri nama, misalnya `kalkulator-akuntansi`, pilih **Public**.
-2. Klik **uploading an existing file**, lalu upload `index.html` dan `README.md`. Klik **Commit changes**.
-3. Buka **Settings**, pilih **Pages**.
-4. Pada **Build and deployment**, pilih **Deploy from a branch**, branch `main`, folder `/ (root)`, lalu **Save**.
-5. Tunggu 1 sampai 2 menit. Websitemu aktif di `https://USERNAME.github.io/kalkulator-akuntansi/`.
+## Struktur kode (semua di `index.html`)
 
-## Struktur kode
-
-Semua ada di satu file `index.html`:
-
-- `A`: daftar akun (nama, golongan, saldo normal)
-- `T`: daftar template transaksi (akun debit dan akun kredit)
-- Tambah transaksi baru dengan menambah satu baris di `T`
-- Tambah akun baru dengan menambah satu baris di `A`
+- `DA`: daftar akun bawaan beserta syarat pengaturannya
+- `T`: daftar template transaksi, format `"debit>kredit|debit2>kredit2"` (pasangan kedua memakai nominal kedua)
+- Akun baru atau template baru cukup menambah satu baris di `DA` atau `T`
