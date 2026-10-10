@@ -1,4 +1,4 @@
-const C = 'akuntansi-v4';
+const C = 'akuntansi-v5';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
